@@ -1,0 +1,197 @@
+{
+  "rules": {
+    // By default, deny read/write access to all data
+    ".read": false,
+    ".write": false,
+    
+    // Public data readable by anyone, but writable only once for setup
+    "public": {
+      ".read": true,
+      "setupComplete": {
+        ".write": "!data.exists() && newData.val() === true"
+      }
+    },
+    
+    // Settings are readable by all authenticated users, but writable only by System Admins
+    "settings": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'System Administrator'"
+    },
+    
+    // User presence can be read by anyone authenticated, but only written by the user themselves.
+    // Removed dependency on /users to fix permission issue for restricted roles.
+    "presences": {
+      ".read": "auth != null",
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+    
+    // User data rules
+    "users": {
+      ".read": "auth != null",
+      "$uid": {
+        // SysAdmins can write to any user record. Admins can manage users in their facility. Users can update their own data.
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || auth.uid === $uid || (root.child('users').child(auth.uid).child('role').val() === 'Admin' && ( (newData.exists() && newData.child('facilityId').val() === root.child('users').child(auth.uid).child('facilityId').val()) || (data.exists() && data.child('facilityId').val() === root.child('users').child(auth.uid).child('facilityId').val()) ) ) )"
+      }
+    },
+    
+    // Rules for management tables
+    "facilities": {
+      ".read": "auth != null",
+      "$facilityId": {
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || root.child('users').child(auth.uid).child('role').val() === 'Admin')"
+      }
+    },
+    "storageLocations": {
+      ".read": "auth != null",
+      "$locationId": {
+        // Admins can only manage locations in their own facility
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || (root.child('users').child(auth.uid).child('role').val() === 'Admin' && ( (newData.exists() && newData.child('facilityId').val() === root.child('users').child(auth.uid).child('facilityId').val()) || (data.exists() && data.child('facilityId').val() === root.child('users').child(auth.uid).child('facilityId').val()) ) ) )"
+      }
+    },
+    "categories": {
+      ".read": "auth != null",
+      "$id": { ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || root.child('users').child(auth.uid).child('role').val() === 'Admin')" }
+    },
+    "programs": {
+      ".read": "auth != null",
+      "$id": { ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || root.child('users').child(auth.uid).child('role').val() === 'Admin')" }
+    },
+    "suppliers": {
+      ".read": "auth != null",
+      "$id": { ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || root.child('users').child(auth.uid).child('role').val() === 'Admin')" }
+    },
+    "serviceProviders": {
+      ".read": "auth != null",
+      "$id": { ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || root.child('users').child(auth.uid).child('role').val() === 'Admin')" }
+    },
+    "itemMasters": {
+      ".read": "auth != null",
+      "$id": { ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || root.child('users').child(auth.uid).child('role').val() === 'Admin' || root.child('users').child(auth.uid).child('role').val() === 'Encoder')" }
+    },
+    "fundSources": {
+      ".read": "auth != null",
+      "$id": { ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || root.child('users').child(auth.uid).child('role').val() === 'Admin')" }
+    },
+
+    // Inventory and Asset Items
+    "inventoryItems": {
+      ".read": "auth != null",
+      "$itemId": {
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || root.child('users').child(auth.uid).child('role').val() === 'Admin' || (root.child('users').child(auth.uid).child('role').val() === 'Encoder' && ( (newData.exists() && newData.hasChild('storageLocationId') && root.child('storageLocations').child(newData.child('storageLocationId').val()).child('facilityId').val() === root.child('users').child(auth.uid).child('facilityId').val()) || (data.exists() && data.hasChild('storageLocationId') && root.child('storageLocations').child(data.child('storageLocationId').val()).child('facilityId').val() === root.child('users').child(auth.uid).child('facilityId').val()) ) ) )"
+      }
+    },
+    "assetItems": {
+      ".read": "auth != null",
+      "$itemId": {
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || root.child('users').child(auth.uid).child('role').val() === 'Admin' || (root.child('users').child(auth.uid).child('role').val() === 'Encoder' && ( (newData.exists() && newData.hasChild('storageLocationId') && root.child('storageLocations').child(newData.child('storageLocationId').val()).child('facilityId').val() === root.child('users').child(auth.uid).child('facilityId').val()) || (data.exists() && data.hasChild('storageLocationId') && root.child('storageLocations').child(data.child('storageLocationId').val()).child('facilityId').val() === root.child('users').child(auth.uid).child('facilityId').val()) ) ) )"
+      }
+    },
+    "purchaseOrders": {
+      ".read": "auth != null",
+      "$poId": {
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || root.child('users').child(auth.uid).child('role').val() === 'Admin' || root.child('users').child(auth.uid).child('role').val() === 'Encoder')"
+      }
+    },
+    "bulletinBoard": {
+      ".read": "auth != null",
+      "$pageId": {
+        ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'System Administrator'"
+      }
+    },
+
+    // Transaction Logs: SysAdmin can perform any write operation (create, update, delete). Other roles can only create.
+    "receiveLogs":    { ".read": "auth != null", "$logId": { ".write": "(auth != null && root.child('users').child(auth.uid).child('role').val() === 'System Administrator') || (!data.exists() && auth != null && ((root.child('users').child(auth.uid).child('role').val() === 'Admin' || root.child('users').child(auth.uid).child('role').val() === 'Encoder') && newData.child('facilityId').val() === root.child('users').child(auth.uid).child('facilityId').val()))" } },
+    "dispenseLogs":   { ".read": "auth != null", "$logId": { ".write": "(auth != null && root.child('users').child(auth.uid).child('role').val() === 'System Administrator') || (!data.exists() && auth != null && ((root.child('users').child(auth.uid).child('role').val() === 'Admin' || root.child('users').child(auth.uid).child('role').val() === 'Encoder') && newData.child('facilityId').val() === root.child('users').child(auth.uid).child('facilityId').val()))" } },
+    "writeOffLogs":   { ".read": "auth != null", "$logId": { ".write": "(auth != null && root.child('users').child(auth.uid).child('role').val() === 'System Administrator') || (!data.exists() && auth != null && ((root.child('users').child(auth.uid).child('role').val() === 'Admin' || root.child('users').child(auth.uid).child('role').val() === 'Encoder') && newData.child('facilityId').val() === root.child('users').child(auth.uid).child('facilityId').val()))" } },
+    "returnLogs":     { ".read": "auth != null", "$logId": { ".write": "(auth != null && root.child('users').child(auth.uid).child('role').val() === 'System Administrator') || (!data.exists() && auth != null && ((root.child('users').child(auth.uid).child('role').val() === 'Admin' || root.child('users').child(auth.uid).child('role').val() === 'Encoder') && newData.child('facilityId').val() === root.child('users').child(auth.uid).child('facilityId').val()))" } },
+    "internalReturnLogs": { ".read": "auth != null", "$logId": { ".write": "(auth != null && root.child('users').child(auth.uid).child('role').val() === 'System Administrator') || (!data.exists() && auth != null && ((root.child('users').child(auth.uid).child('role').val() === 'Admin' || root.child('users').child(auth.uid).child('role').val() === 'Encoder') && newData.child('facilityId').val() === root.child('users').child(auth.uid).child('facilityId').val()))" } },
+    "risLogs":        { ".read": "auth != null", "$logId": { ".write": "(auth != null && root.child('users').child(auth.uid).child('role').val() === 'System Administrator') || (!data.exists() && auth != null && ((root.child('users').child(auth.uid).child('role').val() === 'Admin' || root.child('users').child(auth.uid).child('role').val() === 'Encoder') && newData.child('facilityId').val() === root.child('users').child(auth.uid).child('facilityId').val()))" } },
+    "roLogs":         { ".read": "auth != null", "$logId": { ".write": "(auth != null && root.child('users').child(auth.uid).child('role').val() === 'System Administrator') || (!data.exists() && auth != null && ((root.child('users').child(auth.uid).child('role').val() === 'Admin' || root.child('users').child(auth.uid).child('role').val() === 'Encoder') && newData.child('facilityId').val() === root.child('users').child(auth.uid).child('facilityId').val()))" } },
+    "adjustmentLogs": { ".read": "auth != null", "$logId": { ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || ( (root.child('users').child(auth.uid).child('role').val() === 'Admin' || root.child('users').child(auth.uid).child('role').val() === 'Encoder') && newData.child('facilityId').val() === root.child('users').child(auth.uid).child('facilityId').val() ) )" } },
+    
+    "transferLogs": {
+      ".read": "auth != null",
+      "$logId": {
+        // Create: check fromFacilityId. Update (Acknowledge): check toFacilityId.
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || ( (root.child('users').child(auth.uid).child('role').val() === 'Admin' || root.child('users').child(auth.uid).child('role').val() === 'Encoder') && ( (!data.exists() && newData.child('fromFacilityId').val() === root.child('users').child(auth.uid).child('facilityId').val()) || (data.exists() && data.child('toFacilityId').val() === root.child('users').child(auth.uid).child('facilityId').val()) ) ) )"
+      }
+    },
+    
+    // Physical counts involve multiple roles and statuses
+    "physicalCounts": {
+      ".read": "auth != null",
+      "$countId": {
+        // SysAdmin/Admin can do anything. Encoder can initiate in their facility, or update if assigned to them.
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || (root.child('users').child(auth.uid).child('role').val() === 'Admin' && ( (newData.exists() && newData.child('facilityId').val() === root.child('users').child(auth.uid).child('facilityId').val()) || (data.exists() && data.child('facilityId').val() === root.child('users').child(auth.uid).child('facilityId').val()) )) || (root.child('users').child(auth.uid).child('role').val() === 'Encoder' && ( (!data.exists() && newData.child('facilityId').val() === root.child('users').child(auth.uid).child('facilityId').val()) || (data.exists() && data.child('assignedToUserId').val() === auth.uid) ) ) )"
+      }
+    },
+
+    "auditLogs": {
+      ".read": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || root.child('users').child(auth.uid).child('role').val() === 'Admin' || root.child('users').child(auth.uid).child('role').val() === 'Auditor' || (query.orderByChild === 'uid' && query.equalTo === auth.uid))",
+      ".indexOn": ["uid"],
+      "$logId": {
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || (!data.exists() && newData.child('uid').val() === auth.uid))"
+      }
+    },
+    
+    "notifications": {
+      ".read": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || root.child('users').child(auth.uid).child('role').val() === 'Admin' || root.child('users').child(auth.uid).child('role').val() === 'Encoder' || (query.orderByChild === 'userId' && query.equalTo === auth.uid))",
+      ".indexOn": ["userId", "sourceId"],
+      "$notifId": {
+        // Anyone can create notifications. Only recipients, Admins, SysAdmins, or Encoders can update/delete any notification.
+        ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || root.child('users').child(auth.uid).child('role').val() === 'Admin' || root.child('users').child(auth.uid).child('role').val() === 'Encoder' || !data.exists() || data.child('userId').val() === auth.uid)"
+      }
+    },
+    
+    // Chat rules
+    "chatMessages": {
+      "$convoId": {
+        ".read": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || root.child('conversations').child($convoId).child('participantIds').child(auth.uid).val() === true)",
+        ".indexOn": "timestamp",
+        "$messageId": {
+           // Allow SysAdmins to write (including delete). Otherwise, only allow participants to create new messages.
+          ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || (root.child('conversations').child($convoId).child('participantIds').child(auth.uid).val() === true && newData.child('senderId').val() === auth.uid && !data.exists()))"
+        }
+      }
+    },
+    "conversations": {
+      ".read": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'System Administrator'",
+      "$convoId": {
+        ".read": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || data.child('participantIds').child(auth.uid).val() === true)",
+        ".write": "auth != null && ( (newData.exists() && newData.child('participantIds').child(auth.uid).val() === true) || (data.exists() && data.child('participantIds').child(auth.uid).val() === true) )",
+        "unreadCounts": {
+          "$uid": {
+            // A participant can write to any unread count (sending/incrementing)
+            // or a user can write to their own (marking as read).
+            ".write": "auth != null && root.child('conversations').child($convoId).child('participantIds').child(auth.uid).val() === true"
+          }
+        }
+      }
+    },
+    "user-conversations": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        "$convoId": {
+          // Allow participants to write their own record, or create records for other participants if they are also included in the new data.
+          ".write": "auth != null && ( (newData.exists() && newData.hasChild(auth.uid) && newData.hasChild($uid)) || (data.exists() && auth.uid === $uid) )"
+        }
+      }
+    },
+    "consignmentConsumptionLogs": {
+      ".read": "auth != null",
+      ".write": "auth != null && (root.child('users').child(auth.uid).child('role').val() === 'System Administrator' || (!data.exists() && (root.child('users').child(auth.uid).child('role').val() === 'Admin' || root.child('users').child(auth.uid).child('role').val() === 'Encoder')))"
+    },
+    
+    "fiscalYears": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'System Administrator'"
+    },
+    
+    "fiscalYearEndBalances": {
+      ".read": "auth != null",
+      ".write": "auth != null && root.child('users').child(auth.uid).child('role').val() === 'System Administrator'"
+    }
+  }
+}

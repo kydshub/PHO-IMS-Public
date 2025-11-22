@@ -1,0 +1,4 @@
+itemMasterName,quantity,expiryDate,batchNumber,facilityName,storageLocationName,supplierName,programName,purchaseOrder
+"Digital Thermometer",5,2029-01-01,BATCH-TH-001,"South General Hospital","Supply Room","Global MedTech",,
+"Stethoscope (Cardiology)",2,2030-01-01,BATCH-ST-001,"North District Hospital","Cardiology Dept","PharmaUnited",,PO-2024-101
+"Sphygmomanometer (Aneroid)",10,2028-05-31,BATCH-BP-001,"East Community Clinic","Consultation Room 1","Global MedTech",,

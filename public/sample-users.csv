@@ -1,0 +1,5 @@
+name,email,password,role,facilityName,position
+"Alice Johnson",alice.j@health.gov,password123,Admin,"Main Health Office",System Admin
+"Bob Williams",bob.w@health.gov,password123,Encoder,"North District Hospital",Nurse
+"Charlie Brown",charlie.b@health.gov,password123,User,"South General Hospital",Staff
+"Diana Prince",diana.p@health.gov,password123,Auditor,"Main Health Office",Auditor

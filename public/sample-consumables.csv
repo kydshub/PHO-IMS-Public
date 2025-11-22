@@ -1,0 +1,4 @@
+itemMasterName,quantity,expiryDate,batchNumber,facilityName,storageLocationName,supplierName,programName,purchaseOrder
+"Gauze Pads (4x4 sterile)",10,2025-12-31,BATCH-GZ-001,"Main Health Office","Main Pharmacy","Global MedTech","National Immunization Program",PO-2024-001
+"Syringes (10ml with needle)",50,2026-06-30,BATCH-SY-002,"North District Hospital","Warehouse A","PharmaUnited",,
+"Alcohol Prep Pads",25,2025-08-31,BATCH-ALC-001,"South General Hospital","Supply Room","Global MedTech",,PO-2024-003

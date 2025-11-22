@@ -1,0 +1,8 @@
+{
+  "name": "Copy of Provincial Health Office Inventory Management System",
+  "description": "Version 1.0.0 - Official stable release of the Provincial Health Office Inventory Management System (PHO-IMS). Update 11/01/2025",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "prompt": ""
+}
